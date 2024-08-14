@@ -7,6 +7,7 @@ protected:
     std::string name;
     int severity;
     std::string affectedArea;
+
 public:
     Disaster(const std::string& name, int severity, const std::string& affectedArea)
         : name(name), severity(severity), affectedArea(affectedArea){}
@@ -79,18 +80,64 @@ public:
     }
 };
 int main(){
-    Hurricane hurricane("Katrina", 5, "New Orleans");
+    std::string disasterName, affectedArea;
+    int severity, numTeams;
 
-    // Creating a Medical Team object
-    MedicalTeam medTeam("Red Cross", 50);
+    // Taking user input for disaster details
+    std::cout << "Enter the name of the disaster: ";
+    std::getline(std::cin, disasterName);
 
-    // Displaying disaster impact
-    hurricane.impact();
+    std::cout << "Enter the severity level of the disaster (1-5): ";
+    std::cin >>severity;
+    std::cin.ignore();
 
-    // Displaying team information and responding to the disaster
-    medTeam.displayTeamInfo();
-    medTeam.respond(hurricane);
+    std::cout << "Enter the affected area: ";
+    std::getline(std::cin, affectedArea);
 
-    // std::cout << "Hello from cpp" << std::endl;
+    // Creating a Hurricane object using user input
+    Hurricane hurricane(disasterName, severity, affectedArea);
+
+    std::cout << "Enter the number of response teams: ";
+    std::cin >> numTeams;
+    std::cin.ignore();
+
+    // Creating an array of MedicalTeam objects based on user input
+    MedicalTeam* teams = new MedicalTeam[numTeams];
+    for(int i=0;i<numTeams;++i){
+        std::string teamName;
+        int teamSize;
+
+        std::cout << "\nEnter the name of team " << i + 1 << ": ";
+        std::getline(std::cin, teamName);
+
+        std::cout << "Enter the size of team " << i +1 << ": ";
+        std::cin >> teamSize;
+        std::cin.ignore();
+
+        teams[i] = MedicalTeam(teamName, teamSize);
+
+        int numResources;
+        std::cout << "Enter the number of resources for " << teamName << ": ";
+        std::cin >> numResources;
+        std::cin.ignore();
+
+        for(int j=0;j<numResources;j++){
+            std::string resource;
+            std::cout << "Enter resource " << j +1 << " ";
+            std::getline(std::cin, resource);
+            teams[i].addResource(resource);
+        }
+
+        // Displaying disaster impact
+        hurricane.impact();
+
+        for(int i=0;i<numTeams;i++){
+            std::cout << "\nTeam" << i + 1 << "Information:" << std::endl;
+            teams[i].displayTeamInfo();
+            teams[i].respond(hurricane);
+        }
+
+        delete[] teams;
+    }
     return 0;
 }
