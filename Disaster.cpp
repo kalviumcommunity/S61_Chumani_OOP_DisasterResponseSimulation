@@ -18,7 +18,7 @@ public:
 
     // Getter for affectedArea
     std::string getAffectedArea() const {
-        return affectedArea;
+        return this->affectedArea;  // using 'this' pointer
     }
 };
 class ResponseTeam {
@@ -36,7 +36,8 @@ public:
 
     // Method to add a resource to the team's inventory
     void addResource(const std::string& resource){
-        resources.push_back(resource);
+        this->resources.push_back(resource); // Using 'this pointer for clarity
+        return *this;
     }
 
     // Method to display team information
