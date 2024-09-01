@@ -24,6 +24,9 @@ public:
     std::string getAffectedArea() const {
         return this->affectedArea;  // Using 'this' pointer
     }
+
+    // virtual destructor to ensure proper cleanup in derived classes
+    virtual ~Disaster() {}
 };
 
 // Class to represent a Response Team
@@ -62,6 +65,9 @@ public:
         std::cout << teamName << " is responding to the disaster in " 
                   << disaster.getAffectedArea() << std::endl;
     }
+
+    // virtual destructor to nesure proper cleanup in derived classes
+    virtual ~ResponseTeam() {}
 };
 
 // Derived class to represent a specific type of Disaster (e.g., Hurricane)
@@ -110,8 +116,8 @@ int main() {
     std::cout << "Enter the affected area: ";
     std::getline(std::cin, affectedArea);
 
-    // Creating a Hurricane object using user input
-    Hurricane hurricane(disasterName, severity, affectedArea);
+    // Creating a Hurricane object using dynamic memory allocation
+    Disaster* hurricane = new Hurricane(disasterName, severity, affectedArea);
 
     // Taking user input for number of response teams
     std::cout << "Enter the number of response teams: ";
@@ -119,7 +125,7 @@ int main() {
     std::cin.ignore(); // To ignore the leftover newline character
 
     // Creating an array of MedicalTeam objects based on user input
-    MedicalTeam* teams = new MedicalTeam[numTeams];
+    MedicalTeam** teams = new MedicalTeam*[numTeams];
     for (int i = 0; i < numTeams; ++i) {
         std::string teamName;
         int teamSize;
@@ -131,7 +137,8 @@ int main() {
         std::cin >> teamSize;
         std::cin.ignore(); // To ignore the leftover newline character
 
-        teams[i] = MedicalTeam(teamName, teamSize);
+        // using dynamic memory allocation for each team
+        teams[i] = new MedicalTeam(teamName, teamSize);
 
         int numResources;
         std::cout << "Enter the number of resources for " << teamName << ": ";
@@ -142,21 +149,29 @@ int main() {
             std::string resource;
             std::cout << "Enter resource " << j + 1 << ": ";
             std::getline(std::cin, resource);
-            teams[i].addResource(resource);
+            teams[i]->addResource(resource);
         }
     }
 
     // Displaying disaster impact
-    hurricane.impact();
+    hurricane->impact();
 
     // Displaying team information and responding to the disaster
     for (int i = 0; i < numTeams; ++i) {
         std::cout << "\nTeam " << i + 1 << " Information:" << std::endl;
-        teams[i].displayTeamInfo();
-        teams[i].respond(hurricane);
+        teams[i]->displayTeamInfo();
+        teams[i]->respond(*hurricane);
+    }
+
+    // Freeing the dynamically allocated memory for teams
+    for(int i=0;i<numTeams;i++){
+        delete teams[i];
     }
 
     delete[] teams; // Freeing the dynamically allocated memory
+
+    // Freeing the dynamically allocated memory for hurricane
+    delete hurricane;
 
     return 0;
 }
