@@ -9,10 +9,15 @@ protected:
     int severity; // Severity level of the disaster
     std::string affectedArea; // Name of the area affected
 
+    // Static variable to count total number of disasters
+    static int totalDisasters;
+
 public:
     // Constructor
     Disaster(const std::string& name, int severity, const std::string& affectedArea)
-        : name(name), severity(severity), affectedArea(affectedArea) {}
+        : name(name), severity(severity), affectedArea(affectedArea) {
+            ++totalDisasters; // Increment totalDisasters for each new Disaster instance
+        }
 
     // Method to display the impact of the disaster
     virtual void impact() {
@@ -25,9 +30,17 @@ public:
         return this->affectedArea;  // Using 'this' pointer
     }
 
+    // Method to get the total number of disasters
+    static int getTotalDisasters() {
+        return totalDisasters;
+    }
+
     // virtual destructor to ensure proper cleanup in derived classes
     virtual ~Disaster() {}
 };
+
+// Initializing static variable
+int Disaster::totalDisasters = 0;
 
 // Class to represent a Response Team
 class ResponseTeam {
@@ -36,13 +49,20 @@ protected:
     int teamSize;
     std::vector<std::string> resources;
 
+    // Static variable to count total number of response teams
+    static int totalResponseTeams;
+
 public:
     // Default constructor
-    ResponseTeam() : teamName(""), teamSize(0) {}
+    ResponseTeam() : teamName(""), teamSize(0) {
+        ++totalResponseTeams; // Increment totalResponseTeams for each new ResponseTeam instance
+    }
 
     // Constructor
     ResponseTeam(const std::string& teamName, int teamSize)
-        : teamName(teamName), teamSize(teamSize) {}
+        : teamName(teamName), teamSize(teamSize) {
+            ++totalResponseTeams; // Increment totalResponseTeams for each new ResponseTeam instance
+        }
 
     // Method to add a resource to the team's inventory
     ResponseTeam& addResource(const std::string& resource) {
@@ -60,6 +80,11 @@ public:
         std::cout << std::endl;
     }
 
+    // Method to get the total number of response teams
+    static int getTotalResponseTeams() {
+        return totalResponseTeams;
+    }
+
     // Virtual method to be overridden by specific team types
     virtual void respond(Disaster& disaster) {
         std::cout << teamName << " is responding to the disaster in " 
@@ -69,6 +94,9 @@ public:
     // virtual destructor to nesure proper cleanup in derived classes
     virtual ~ResponseTeam() {}
 };
+
+// Inititalizing static variable
+int ResponseTeam::totalResponseTeams = 0;
 
 // Derived class to represent a specific type of Disaster (e.g., Hurricane)
 class Hurricane : public Disaster {
@@ -162,6 +190,10 @@ int main() {
         teams[i]->displayTeamInfo();
         teams[i]->respond(*hurricane);
     }
+
+    // Displaying the total number of disasters and response teams
+    std::cout << "\nTotal number of disasters: " << Disaster::getTotalDisasters() << std::endl;
+    std::cout << "Total number of response teams: " << ResponseTeam::getTotalResponseTeams() << std::endl;
 
     // Freeing the dynamically allocated memory for teams
     for(int i=0;i<numTeams;i++){
