@@ -196,7 +196,7 @@ int main() {
     std::cout << "Total number of response teams: " << ResponseTeam::getTotalResponseTeams() << std::endl;
 
     // Freeing the dynamically allocated memory for teams
-    for(int i=0;i<numTeams;i++){
+    for(int i = 0; i < numTeams; i++){
         delete teams[i];
     }
 
@@ -207,5 +207,6 @@ int main() {
 
     return 0;
 }
+
 
 
