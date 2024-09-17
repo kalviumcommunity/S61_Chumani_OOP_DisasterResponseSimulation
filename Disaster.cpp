@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+using namespace std;
 
 // Class to represent a Disaster
 class Disaster {
@@ -19,6 +20,30 @@ public:
             ++totalDisasters; // Increment totalDisasters for each new Disaster instance
         }
 
+    // Getter for severity
+    int getSeverity() const {
+        return severity;
+    }
+
+    // setter for severity
+    void setSeverity(int newSeverity){
+        if(newSeverity >= 1 && newSeverity <= 5){
+            severity = newSeverity;
+        }else{
+            cout << "Invalid severity value.  Please enter a value between 1 and 5." << endl;
+        }
+    }
+
+    // Getter for name
+    string getName() const {
+        return name;
+    }
+
+    // setter for name
+    void setName(const std::string& newName){
+        name = newName;
+    }
+
     // Method to display the impact of the disaster
     virtual void impact() {
         std::cout << "\nDisaster: " << name << "\nSeverity: " << severity 
@@ -28,6 +53,11 @@ public:
     // Getter for affectedArea using 'this' pointer
     std::string getAffectedArea() const {
         return this->affectedArea;  // Using 'this' pointer
+    }
+
+    // setter for affected Area
+    void setAffectedArea(const std::string& newAffectedArea){
+        affectedArea = newAffectedArea;
     }
 
     // Method to get the total number of disasters
@@ -63,6 +93,30 @@ public:
         : teamName(teamName), teamSize(teamSize) {
             ++totalResponseTeams; // Increment totalResponseTeams for each new ResponseTeam instance
         }
+
+    // Getter for team name
+    string getTeamName() const {
+        return teamName;
+    }
+
+    // setter for team name
+    void setTeamName(const std::string& newTeamName){
+        teamName = newTeamName;
+    }
+
+    // Getter for team size
+    int getTeamSize() const {
+        return teamSize;
+    }
+
+    // setter for team size
+    void setTeamSize(int newTeamSize){
+        if(newTeamSize > 0){
+            teamSize = newTeamSize;
+        }else{
+            cout << "Invalid team size.  It must be greater than 0." << endl;
+        }
+    }
 
     // Method to add a resource to the team's inventory
     ResponseTeam& addResource(const std::string& resource) {
