@@ -5,11 +5,12 @@ using namespace std;
 
 // Class to represent a Disaster
 class Disaster {
-protected:
+private:
     std::string name;
     int severity; // Severity level of the disaster
     std::string affectedArea; // Name of the area affected
 
+protected:
     // Static variable to count total number of disasters
     static int totalDisasters;
 
@@ -44,20 +45,19 @@ public:
         name = newName;
     }
 
+    string getAffectedArea() const {
+        return affectedArea;
+    }
+
+        // setter for affected Area
+    void setAffectedArea(const std::string& newAffectedArea){
+        affectedArea = newAffectedArea;
+    }
+
     // Method to display the impact of the disaster
     virtual void impact() {
         std::cout << "\nDisaster: " << name << "\nSeverity: " << severity 
                   << "\nAffected Area: " << affectedArea << std::endl;
-    }
-
-    // Getter for affectedArea using 'this' pointer
-    std::string getAffectedArea() const {
-        return this->affectedArea;  // Using 'this' pointer
-    }
-
-    // setter for affected Area
-    void setAffectedArea(const std::string& newAffectedArea){
-        affectedArea = newAffectedArea;
     }
 
     // Method to get the total number of disasters
@@ -74,11 +74,12 @@ int Disaster::totalDisasters = 0;
 
 // Class to represent a Response Team
 class ResponseTeam {
-protected:
+private:
     std::string teamName;
     int teamSize;
     std::vector<std::string> resources;
 
+protected:
     // Static variable to count total number of response teams
     static int totalResponseTeams;
 
@@ -118,10 +119,8 @@ public:
         }
     }
 
-    // Method to add a resource to the team's inventory
-    ResponseTeam& addResource(const std::string& resource) {
-        this->resources.push_back(resource);  // Using 'this' pointer for clarity
-        return *this;  // Returning the current object to allow method chaining
+    void addResource(const std::string& resource){
+        this->resources.push_back(resource);
     }
 
     // Method to display team information
@@ -161,8 +160,8 @@ public:
 
     // Overriding the impact method for a Hurricane
     void impact() override {
-        std::cout << "Hurricane: " << name << " is causing severe damage in " 
-                  << affectedArea << " with a severity of " << severity << std::endl;
+        std::cout << "Hurricane: " << getName() << " is causing severe damage in " 
+                  << getAffectedArea() << " with a severity of " << getSeverity() << std::endl;
     }
 };
 
@@ -178,7 +177,7 @@ public:
 
     // Overriding the respond method for Medical Team
     void respond(Disaster& disaster) override {
-        std::cout << teamName << " is providing medical assistance in " 
+        std::cout << getTeamName() << " is providing medical assistance in " 
                   << disaster.getAffectedArea() << std::endl;
     }
 };
@@ -261,6 +260,3 @@ int main() {
 
     return 0;
 }
-
-
-
