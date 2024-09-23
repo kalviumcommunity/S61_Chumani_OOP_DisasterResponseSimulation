@@ -15,10 +15,16 @@ protected:
     static int totalDisasters;
 
 public:
-    // Constructor
+    // Default Constructor
+    Disaster() : name("Unknown"), severity(1), affectedArea("Unknown") {
+        ++totalDisasters;
+        cout << "Default Disaster Constructor called" << endl;
+    }
+    // Parameterized Constructor
     Disaster(const std::string& name, int severity, const std::string& affectedArea)
         : name(name), severity(severity), affectedArea(affectedArea) {
             ++totalDisasters; // Increment totalDisasters for each new Disaster instance
+            cout << "Parameterized Disaster Constructor Called" << endl;
         }
 
     // Getter for severity
@@ -66,7 +72,9 @@ public:
     }
 
     // virtual destructor to ensure proper cleanup in derived classes
-    virtual ~Disaster() {}
+    virtual ~Disaster() {
+        cout << "Disaster Desutructor Called" << endl;
+    }
 };
 
 // Initializing static variable
@@ -85,14 +93,16 @@ protected:
 
 public:
     // Default constructor
-    ResponseTeam() : teamName(""), teamSize(0) {
+    ResponseTeam() : teamName("Default Ream"), teamSize(1) {
         ++totalResponseTeams; // Increment totalResponseTeams for each new ResponseTeam instance
+        cout << "Default Response Team Constructor Called" << endl;
     }
 
-    // Constructor
+    // Parameterized Constructor
     ResponseTeam(const std::string& teamName, int teamSize)
         : teamName(teamName), teamSize(teamSize) {
             ++totalResponseTeams; // Increment totalResponseTeams for each new ResponseTeam instance
+            cout << "Parameterized ResponseTeam Constructor Called" << endl;
         }
 
     // Getter for team name
@@ -145,7 +155,9 @@ public:
     }
 
     // virtual destructor to nesure proper cleanup in derived classes
-    virtual ~ResponseTeam() {}
+    virtual ~ResponseTeam() {
+        cout << "ResponseTeam Destructor Called" << endl;
+    }
 };
 
 // Inititalizing static variable
@@ -248,15 +260,15 @@ int main() {
     std::cout << "\nTotal number of disasters: " << Disaster::getTotalDisasters() << std::endl;
     std::cout << "Total number of response teams: " << ResponseTeam::getTotalResponseTeams() << std::endl;
 
+    // Deleting dynamically allocated objects
+    delete hurricane;
+
     // Freeing the dynamically allocated memory for teams
     for(int i = 0; i < numTeams; i++){
         delete teams[i];
     }
 
     delete[] teams; // Freeing the dynamically allocated memory
-
-    // Freeing the dynamically allocated memory for hurricane
-    delete hurricane;
-
+    
     return 0;
 }
