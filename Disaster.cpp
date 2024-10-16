@@ -170,15 +170,72 @@ public:
 // Inititalizing static variable
 int ResponseTeam::totalResponseTeams = 0;
 
+// Abstract Class to represent an Emergency Response Team
+class EmergencyResponse {
+public:
+    //Pure virtual function to be overriden in derived classes
+    virtual void respondToDisaster() = 0;
+
+    // Virtual destructor for proper cleanup
+    virtual ~EmergencyResponse() {
+        cout << "EmergencyResponse Destructor Called" << endl;
+    }
+};
+
+// Derived class for Medical Team implementing the abstract class
+class MedicalTeam : public EmergencyResponse {
+private:
+    std::string teamName;
+    int teamSize;
+
+public:
+    MedicalTeam(const std::string& name, int size) : teamName(name), teamSize(size) {}
+
+    // Overriding the pure virtual function
+    void respondToDisaster() override {
+        cout << teamName << " (Medical Team) is providing medical assistance with " << teamSize << " members." << endl;
+    }
+};
+
+// Derived class for FireFighter Team implementing the abstract class
+class FireFighterTeam : public EmergencyResponse {
+private:
+    std::string teamName;
+    int teamSize;
+
+public:
+    FireFighterTeam(const std::string& name, int size) : teamName(name), teamSize(size) {}
+
+    // Overriding the pure virtual function
+    void respondToDisaster() override {
+        cout << teamName << " (Firefighter Team) is putting out fires with " << teamSize << " members." << endl;
+    }
+};
+
+// Derived class for Search and Rescue Team implementing the abstract class
+class SearchAndRescueTeam : public EmergencyResponse {
+private:
+    std::string teamName;
+    int teamSize;
+
+public:
+    SearchAndRescueTeam(const std::string& name, int size) : teamName(name), teamSize(size) {}
+
+    // Overriding the pure virtual function
+    void respondToDisaster() override {
+        cout << teamName << " (Search and Rescue Team) is rescuing trapped individuals with " << teamSize << " members." << endl;
+    }
+};
+
 // Derived class to represent a specific Response Team (e.g., Medical Team)
 // Derived class (Single Inheritance)
-class MedicalTeam : public ResponseTeam {
+class MedicalResponseTeam : public ResponseTeam {
 public:
     // Default constructor
-    MedicalTeam() : ResponseTeam() {}
+    MedicalResponseTeam() : ResponseTeam() {}
 
     // Constructor
-    MedicalTeam(const std::string& teamName, int teamSize)
+    MedicalResponseTeam(const std::string& teamName, int teamSize)
         : ResponseTeam(teamName, teamSize) {}
 
     // Overriding the respond method for Medical Team
@@ -189,14 +246,14 @@ public:
 };
 
 // Derived class (Multilevel Inheritance)
-class AdvancedMedicalTeam : public MedicalTeam {
+class AdvancedMedicalTeam : public MedicalResponseTeam {
 public:
     // Default constructor
-    AdvancedMedicalTeam() : MedicalTeam() {}
+    AdvancedMedicalTeam() : MedicalResponseTeam() {}
 
     // Constructor
     AdvancedMedicalTeam(const std::string& teamName, int teamSize)
-        : MedicalTeam(teamName, teamSize) {}
+        : MedicalResponseTeam(teamName, teamSize) {}
 
     // Overriding the respond method for Advanced Medical Team
     void respond(Disaster& disaster) override {
@@ -230,96 +287,70 @@ int main() {
     // Taking user input for disaster details
     std::cout << "Enter the name of the disaster: ";
     std::getline(std::cin, disasterName);
+
+    do{
+        std::cout << "Enter the severity level of the disaster (1-5): ";
+        std::cin >> severity;
+        if (severity < 1 || severity > 5) {
+            cout << "Invalid input. Please enter a severity level between 1 and 5." << endl;
+        }
+    }while(severity < 1 || severity > 5);
     
-    std::cout << "Enter the severity level of the disaster (1-5): ";
-    std::cin >> severity;
+    
     std::cin.ignore(); // To ignore the leftover newline character
 
     std::cout << "Enter the affected area: ";
     std::getline(std::cin, affectedArea);
 
     // Creating a Hurricane object using dynamic memory allocation
-    Disaster* hurricane = new Hurricane(disasterName, severity, affectedArea);
-
-    // Creating an Advanced Medical Team (multivel inheritance)
-    AdvancedMedicalTeam* advMedicalTeam = new AdvancedMedicalTeam("Advanced Medical Team", 10);
-
-    // Displaying disaster impact
-    hurricane->impact();
-
-    // Advanced Medical Team responding
-    advMedicalTeam->displayTeamInfo();
-    advMedicalTeam->respond(*hurricane);
-    advMedicalTeam->advancedCare();
+    Hurricane hurricane(disasterName, severity, affectedArea);
+    hurricane.impact();
 
     // Taking user input for number of response teams
     std::cout << "Enter the number of response teams: ";
     std::cin >> numTeams;
-    std::cin.ignore(); // To ignore the leftover newline character
 
-    // Creating an array of MedicalTeam objects based on user input
-    MedicalTeam** teams = new MedicalTeam*[numTeams];
-    for (int i = 0; i < numTeams; ++i) {
-        std::string teamName;
+    // Input validation for number of response teams
+    if(numTeams <= 0){
+        cout << "Invalid input. Number of response teams must be greater than 0." << endl;
+        return 1;
+    }
+
+    vector<ResponseTeam*> teams;
+    for (int i = 0; i < numTeams; i++) {
+        string teamName;
         int teamSize;
+        
+        cout << "Enter the name of response team " << (i + 1) << ": ";
+        cin >> ws; // Clear any leading whitespace
+        getline(cin, teamName);
 
-        std::cout << "\nEnter the name of team " << i + 1 << ": ";
-        std::getline(std::cin, teamName);
+        do {
+            cout << "Enter the size of response team " << (i + 1) << ": ";
+            cin >> teamSize;
+            if (teamSize <= 0) {
+                cout << "Invalid input. Team size must be greater than 0." << endl;
+            }
+        } while (teamSize <= 0);
 
-        std::cout << "Enter the size of team " << i + 1 << ": ";
-        std::cin >> teamSize;
-        std::cin.ignore(); // To ignore the leftover newline character
-
-        // using dynamic memory allocation for each team
-        teams[i] = new MedicalTeam(teamName, teamSize);
-
-        int numResources;
-        std::cout << "Enter the number of resources for " << teamName << ": ";
-        std::cin >> numResources;
-        std::cin.ignore(); // To ignore the leftover newline character
-
-        for (int j = 0; j < numResources; ++j) {
-            std::string resource;
-            std::cout << "Enter resource " << j + 1 << ": ";
-            std::getline(std::cin, resource);
-            teams[i]->addResource(resource);
-        }
+        // Create a new MedicalResponseTeam and add it to the vector
+        ResponseTeam* team = new MedicalResponseTeam(teamName, teamSize);
+        teams.push_back(team);
     }
 
-    std::string resource1 = "First Aid Kit";
-    std::vector<std::string> multipleResources = {"Water", "Food Supplies", "Medicines"};
-
-    // Adding a single resource
-    teams[0]->addResource(resource1);
-
-    // Adding multiple resources
-    teams[0]->addResource(multipleResources);
-
-    // Displaying disaster impact again (if required)
-    std::cout << "\nUpdated Disaster Impact Details:\n";
-    hurricane->impact();
-
-    // Displaying team information and responding to the disaster
-    for (int i = 0; i < numTeams; ++i) {
-        std::cout << "\nTeam " << i + 1 << " Information:" << std::endl;
-        teams[i]->displayTeamInfo();
-        teams[i]->respond(*hurricane);
+    // Display team information and respond to disaster
+    for (ResponseTeam* team : teams) {
+        team->displayTeamInfo();
+        team->respond(hurricane);
     }
 
-    // Displaying the total number of disasters and response teams
-    std::cout << "\nTotal number of disasters: " << Disaster::getTotalDisasters() << std::endl;
-    std::cout << "Total number of response teams: " << ResponseTeam::getTotalResponseTeams() << std::endl;
-
-    // Deleting dynamically allocated objects
-    delete hurricane;
-    delete advMedicalTeam;
-
-    // Freeing the dynamically allocated memory for teams
-    for(int i = 0; i < numTeams; i++){
-        delete teams[i];
+    // Clean up memory
+    for (ResponseTeam* team : teams) {
+        delete team; // Deleting each response team object
     }
 
-    delete[] teams; // Freeing the dynamically allocated memory
+    cout << "Total Disasters: " << Disaster::getTotalDisasters() << endl;
+    cout << "Total Response Teams: " << ResponseTeam::getTotalResponseTeams() << endl;
     
     return 0;
 }
