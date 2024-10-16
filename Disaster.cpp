@@ -129,8 +129,15 @@ public:
         }
     }
 
+    // Function overloading to add resources
     void addResource(const std::string& resource){
         this->resources.push_back(resource);
+    }
+
+    void addResource(const std::vector<std::string>& resourceList) {
+        for (const auto& resource : resourceList) {
+            resources.push_back(resource);
+        }
     }
 
     // Method to display team information
@@ -278,6 +285,15 @@ int main() {
             teams[i]->addResource(resource);
         }
     }
+
+    std::string resource1 = "First Aid Kit";
+    std::vector<std::string> multipleResources = {"Water", "Food Supplies", "Medicines"};
+
+    // Adding a single resource
+    teams[0]->addResource(resource1);
+
+    // Adding multiple resources
+    teams[0]->addResource(multipleResources);
 
     // Displaying disaster impact again (if required)
     std::cout << "\nUpdated Disaster Impact Details:\n";
