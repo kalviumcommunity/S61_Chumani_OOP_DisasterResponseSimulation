@@ -31,6 +31,8 @@ public:
                         << "\nAffected Area: " << disaster.getAffectedArea()
                         << std::endl;
     }
+    
+
 };
 
 // Factory class for creating Disaster instances
@@ -55,8 +57,6 @@ public:
     }
 };
 
-
-
 // Class to represent a Disaster
 class Disaster {
 private:
@@ -78,9 +78,7 @@ public:
 
     virtual void impact() const = 0;
 
-    virtual ~Disaster(){
-        std::cout << "Disaster Destructor Called" << std::endl;
-    }
+    virtual ~Disaster() = default;
 
     // Getter for severity
     int getSeverity() const {
@@ -124,61 +122,28 @@ private:
     std::vector<std::string> resources;
 
 protected:
-    // Static variable to count total number of response teams
     static int totalResponseTeams;
 
 public:
-    // Default constructor
-    ResponseTeam() : teamName("Default Ream"), teamSize(1) {
-        ++totalResponseTeams; // Increment totalResponseTeams for each new ResponseTeam instance
-        cout << "Default Response Team Constructor Called" << endl;
-    }
-
-    // Parameterized Constructor
     ResponseTeam(const std::string& teamName, int teamSize)
         : teamName(teamName), teamSize(teamSize) {
-            ++totalResponseTeams; // Increment totalResponseTeams for each new ResponseTeam instance
-            cout << "Parameterized ResponseTeam Constructor Called" << endl;
-        }
-
-    // Getter for team name
-    string getTeamName() const {
-        return teamName;
+        ++totalResponseTeams;
     }
 
-    // setter for team name
-    void setTeamName(const std::string& newTeamName){
-        teamName = newTeamName;
-    }
+    string getTeamName() const { return teamName; }
+    int getTeamSize() const { return teamSize; }
 
-    // Getter for team size
-    int getTeamSize() const {
-        return teamSize;
-    }
-
-    // setter for team size
-    void setTeamSize(int newTeamSize){
-        if(newTeamSize > 0){
-            teamSize = newTeamSize;
-        }else{
-            cout << "Invalid team size.  It must be greater than 0." << endl;
-        }
-    }
-
-    // Function overloading to add resources
-    void addResource(const std::string& resource){
-        this->resources.push_back(resource);
-    }
-
+    void addResource(const std::string& resource) { resources.push_back(resource); }
     void addResource(const std::vector<std::string>& resourceList) {
-        for (const auto& resource : resourceList) {
-            resources.push_back(resource);
-        }
+        resources.insert(resources.end(), resourceList.begin(), resourceList.end());
     }
 
-    // Method to display team information
-    virtual void displayTeamInfo() {
-        std::cout << "\nTeam: " << teamName << "\nTeam Size: " << teamSize 
+    virtual void respond(Disaster& disaster) {
+        std::cout << teamName << " is responding to the disaster in " << disaster.getAffectedArea() << std::endl;
+    }
+
+    virtual void displayTeamInfo() const {
+        std::cout << "\nTeam: " << teamName << "\nTeam Size: " << teamSize
                   << "\nResources: ";
         for (const auto& res : resources) {
             std::cout << res << " ";
@@ -186,18 +151,6 @@ public:
         std::cout << std::endl;
     }
 
-    // Method to get the total number of response teams
-    static int getTotalResponseTeams() {
-        return totalResponseTeams;
-    }
-
-    // Virtual method to be overridden by specific team types
-    virtual void respond(Disaster& disaster) {
-        std::cout << teamName << " is responding to the disaster in " 
-                  << disaster.getAffectedArea() << std::endl;
-    }
-
-    // virtual destructor to nesure proper cleanup in derived classes
     virtual ~ResponseTeam() {
         cout << "ResponseTeam Destructor Called" << endl;
     }
@@ -205,6 +158,39 @@ public:
 
 // Inititalizing static variable
 int ResponseTeam::totalResponseTeams = 0;
+
+// Derived class to represent a specific Response Team (e.g., Medical Team)
+// Derived class (Single Inheritance)
+class MedicalResponseTeam : public ResponseTeam {
+public:
+    // Constructor
+    MedicalResponseTeam(const std::string& teamName, int teamSize)
+        : ResponseTeam(teamName, teamSize) {}
+
+    // Overriding the respond method for Medical Team
+    void respond(Disaster& disaster) override {
+        std::cout << getTeamName() << " is providing medical assistance in " 
+                  << disaster.getAffectedArea() << std::endl;
+    }
+};
+
+// Derived class (Multilevel Inheritance)
+class AdvancedMedicalTeam : public MedicalResponseTeam {
+public:
+    // Constructor
+    AdvancedMedicalTeam(const std::string& teamName, int teamSize)
+        : MedicalResponseTeam(teamName, teamSize) {}
+
+    // Overriding the respond method for Advanced Medical Team
+    void respond(Disaster& disaster) override {
+        std::cout << getTeamName() << " is providing advanced medical care in " << disaster.getAffectedArea() << std::endl;
+    }
+
+    // Special function for advanced care
+    void advancedCare(){
+        std::cout << "Providing specialized advanced care and life-saving treatments." << std::endl;
+    }
+};
 
 // Abstract Class to represent an Emergency Response Team
 class EmergencyResponse {
@@ -260,45 +246,6 @@ public:
     // Overriding the pure virtual function
     void respondToDisaster() override {
         cout << teamName << " (Search and Rescue Team) is rescuing trapped individuals with " << teamSize << " members." << endl;
-    }
-};
-
-// Derived class to represent a specific Response Team (e.g., Medical Team)
-// Derived class (Single Inheritance)
-class MedicalResponseTeam : public ResponseTeam {
-public:
-    // Default constructor
-    MedicalResponseTeam() : ResponseTeam() {}
-
-    // Constructor
-    MedicalResponseTeam(const std::string& teamName, int teamSize)
-        : ResponseTeam(teamName, teamSize) {}
-
-    // Overriding the respond method for Medical Team
-    void respond(Disaster& disaster) override {
-        std::cout << getTeamName() << " is providing medical assistance in " 
-                  << disaster.getAffectedArea() << std::endl;
-    }
-};
-
-// Derived class (Multilevel Inheritance)
-class AdvancedMedicalTeam : public MedicalResponseTeam {
-public:
-    // Default constructor
-    AdvancedMedicalTeam() : MedicalResponseTeam() {}
-
-    // Constructor
-    AdvancedMedicalTeam(const std::string& teamName, int teamSize)
-        : MedicalResponseTeam(teamName, teamSize) {}
-
-    // Overriding the respond method for Advanced Medical Team
-    void respond(Disaster& disaster) override {
-        std::cout << getTeamName() << " is providing advanced medical care in " << disaster.getAffectedArea() << std::endl;
-    }
-
-    // Special function for advanced care
-    void advancedCare(){
-        std::cout << "Providing specialized advanced care and life-saving treatments." << std::endl;
     }
 };
 
