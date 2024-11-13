@@ -36,9 +36,14 @@ public:
 // Factory class for creating Disaster instances
 class DisasterFactory {
 public:
-    static Disaster createDisaster(const std::string& name, int severity, const std::string& affectedArea){
+    static Disaster* createDisaster(const std::string& type, const std::string& name, int severity, const std::string& affectedArea){
         DisasterTracker::increment();
-        return Disaster(name, severity, affectedArea);
+        if(type == "Hurricane"){
+            return new Hurricane(name, severity, affectedArea);
+        }else if(type == "Flood"){
+            return new Flood(name, severity, affectedArea);
+        }
+        return nullptr;
     }
 };
 
@@ -71,6 +76,12 @@ public:
             cout << "Parameterized Disaster Constructor Called" << endl;
         }
 
+    virtual void impact() const = 0;
+
+    virtual ~Disaster(){
+        std::cout << "Disaster Destructor Called" << std::endl;
+    }
+
     // Getter for severity
     int getSeverity() const {
         return severity;
@@ -102,11 +113,6 @@ public:
         // setter for affected Area
     void setAffectedArea(const std::string& newAffectedArea){
         affectedArea = newAffectedArea;
-    }
-
-    // virtual destructor to ensure proper cleanup in derived classes
-    virtual ~Disaster() {
-        cout << "Disaster Desutructor Called" << endl;
     }
 };
 
@@ -304,77 +310,73 @@ public:
         : Disaster(name, severity, affectedArea) {}
 
     // Overriding the impact method for a Hurricane
-    void impact() override {
+    void impact() const override {
         std::cout << "Hurricane: " << getName() << " is causing severe damage in " 
                   << getAffectedArea() << " with a severity of " << getSeverity() << std::endl;
     }
 };
 
+class Flood : public Disaster {
+public:
+    Flood(const std::string& name, int severity, const std::string& affectedArea)
+        : Disaster(name, severity, affectedArea) {}
+
+    void impact() const override {
+        std::cout << "Flood: " << getName() << " is flooding the area of " << getAffectedArea() << " with a severity of " << getSeverity() << std::endl;
+    }
+};
+
 // Function to create a disaster instance using DisasterFactory
-Disaster createDisaster(){
-    std::string disasterName, affectedArea;
+Disaster* createDisaster(){
+    std::string type, name, affectedArea;
     int severity;
 
+    std::cout << "Enter the type of the disaster (Hurricane/Flood): ";
+    std::getline(std::cin, type);
+
     std::cout << "Enter the name of the disaster: ";
-    std::getline(std::cin, disasterName);
+    std::getline(std::cin, name);
 
-    do{
-        std::cout << "Enter the severity level of the disaster (1-5): ";
-        std::cin >> severity;
-        if(severity < 1 || severity > 5){
-            std::cout << "Invalid input. Please enter a severity level between 1 and 5." << std::endl;
-        }
-    }while(severity < 1 || severity > 5);
-
+    std::cout << "Enter the severity level of the disaster (1-5): ";
+    std::cin >> severity;
     std::cin.ignore();
 
     std::cout << "Enter the affected area: ";
     std::getline(std::cin, affectedArea);
 
-    return DisasterFactory::createDisaster(disasterName, severity, affectedArea);
+    return DisasterFactory::createDisaster(type, name, severity, affectedArea);
 };
 
 // Function to create response teams
-std::vector<ResponseTeam*> createResponseTeams(){
+std::vector<ResponseTeam*> createResponseTeams() {
     int numTeams;
     std::vector<ResponseTeam*> teams;
 
-    std::cout << "Enter the number of response teams:";
+    std::cout << "Enter the number of response teams: ";
     std::cin >> numTeams;
+    std::cin.ignore();
 
-    if(numTeams <= 0){
-        std::cout << "Invalid input.  Number of response teams must be greater than 0." << std::endl;
-        return teams;
-    }
-
-    for(int i=0; i<numTeams; i++){
+    for(int i = 0; i < numTeams; ++i) {
         std::string teamName;
         int teamSize;
 
-        std::cout << "Enter the name of response team " << (i+1) << ": ";
-        std::cin >> std::ws;
+        std::cout << "Enter the name of response team " << (i + 1) << ": ";
         std::getline(std::cin, teamName);
 
-        do{
-            std::cout << "Enter the size of response team " << (i+1) << ": ";
-            std::cin >> teamSize;
-            if(teamSize <= 0){
-                std::cout << "Invalid input.  Team size must be greater than 0." << std::endl;
-            }
-        }while(teamSize <= 0);
+        std::cout << "Enter the size of response team " << (i + 1) << ": ";
+        std::cin >> teamSize;
+        std::cin.ignore();
 
-        ResponseTeam* team = new MedicalResponseTeam(teamName, teamSize);
-        teams.push_back(team);
+        teams.push_back(new MedicalResponseTeam(teamName, teamSize));
     }
     return teams;
-};
+}
 
 int main() {
-    // Disaster creation using factory
-    Disaster hurricane = createDisaster();
-
-    // Display disaster details using DisasterDisplay
-    DisasterDisplay::display(hurricane);
+    // Disaster creation
+    Disaster* disaster = createDisaster();
+    DisasterDisplay::display(*disaster);
+    disaster->impact();
 
     // Create response teams
     std::vector<ResponseTeam*> teams = createResponseTeams();
@@ -382,16 +384,19 @@ int main() {
     // Display team information and respond to disaster
     for (ResponseTeam* team : teams) {
         team->displayTeamInfo();
-        team->respond(hurricane);
+        team->respond(*disaster);
     }
 
     // Clean up memory
+    delete disaster;
     for (ResponseTeam* team : teams) {
-        delete team; // Deleting each response team object
+        delete team;
     }
 
     std::cout << "Total Disasters: " << DisasterTracker::getTotalDisasters() << std::endl;
-    std::cout << "Total Response Teams: " << ResponseTeam::getTotalResponseTeams() << std::endl;
 
     return 0;
 }
+
+
+
